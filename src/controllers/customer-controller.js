@@ -1,92 +1,78 @@
-const Consumidor = require('../app/models/customer');
-const { post } = require('../routes/index-route');
+repository = require('../repositories/customer-repository');
 
-exports.post = function (req, res){
-    const consumidor = new Consumidor();
-    consumidor.nome = req.body.nome;
-    consumidor.email = req.body.email;
-    consumidor.senha = req.body.senha;
-
-    // console.log(req.body);
-
-    consumidor.save(function(error){
-        if(error)
-            res.send("Erro ao tentar salvar um novo consumidor ", error);
-        
-        res.status(201).json({message: 'consumidor inserido com sucesso'});
-    });
-};
-
-exports.getAll = function(req, res){
-    Consumidor.find(function(err, cust){
-        if(err)
-            res.send(err);
-
-        res.status(200).json({
-            message: "retorno ok de todos os consumidores",
-            allcustomers: cust
+exports.post = async (req, res) => {
+    try {
+        await repository.post({
+            nome: req.body.nome,
+            email: req.body.email,
+            senha: req.body.senha
         });
-    });
+        res.status(201).send({
+            message: 'Consumidor cadastro com sucesso'
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            message: 'Falha ao processar requisição',
+            erro: error
+        });
+    }
 };
 
-exports.getById = function(req, res){
-    const id = req.params.customerId;
-    Consumidor.findById(id, function(err, consumidor){
-        if (err){
-            res.status(500).json({
-                message: "Erro ao tentar encontrar consumidor; ID mal formado"
-            });
-        }else if(consumidor == null){
-            res.status(400).json({
-                message: "consumidor não encontrado para o id passado"
-            });
-        }else{
-            res.status(200).json({
-                message: "consumidor encontrado",
-                consumidor: consumidor
-            });
-        }
-    });
+exports.getAll = async(req, res) => {
+    try {
+        const data = await repository.getAll();
+        res.status(201).send(data);
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            message: 'Falha ao processar requisição',
+            erro: error
+        });
+    }
 };
 
-exports.put = function(req, res){
-    const id = req.params.customerId;
-    console.log(id)
-    Consumidor.findById(id, function(err, consumidor){
-        if(err){
-            res.status(500).json({
-                message:"Erro ao tentar encontrar consumidor; Id mal formado"
-            });
-        }else if(consumidor == null){
-            res.status(400).json({
-                message: "consumidor não encontrado para o Id passado"
-            });
-        }else{
-            consumidor.nome = req.body.nome;
-            consumidor.email = req.body.email;
-            consumidor.senha = req.body.senha;
-
-            consumidor.save(function(error){
-                if(error)
-                    res.send("Erro ao tentar atualizar o consumidor", error);
-                
-                    res.status(200).json({
-                        message: "consumidor atualizado com sucesso"
-                    });
-            });
-        }
-    });
+exports.getById = async(req, res) => {
+    try {
+        const id = req.params.customerId;
+        const data = await repository.getById(id);
+        res.status(200).send(data);
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            message: 'Falha ao processar requisição',
+            erro: error
+        });
+    }
 };
 
-exports.delete = function(req, res){
-    Consumidor.findByIdAndRemove(req.params.customerId, (err, consumidor) => {
-        if(err) 
-            res.status(500).send("Erro ao deletar ", err)
+exports.put = async(req, res) => {
+    try {
+        const id = req.params.customerId;
+        const data = await repository.put(id, req.body);
+        res.status(200).send({
+            message: 'Consumidor atualizado com sucesso',
+            data: data
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            message: 'Falha ao processar requisição',
+            erro: error
+        });
+    }
+};
 
-        const response ={
-            message: "Consumidor removido com sucesso",
-            id: consumidor.id
-        };
-        return res.status(200).send(response);
-    });
+exports.delete = async(req, res) => {
+    try {
+        await repository.delete(req.params.customerId);
+        res.status(200).send({
+            message: 'Consumidor removido com sucesso'
+        });
+    } catch (error) {
+        res.status(500).send({
+            message: 'Falha ao processar requisição',
+            erro: error
+        });
+    }
 };
