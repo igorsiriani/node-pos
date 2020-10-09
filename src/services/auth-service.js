@@ -22,7 +22,7 @@ exports.authorize = async(req, res, next) => {
             if (error) {
                 res.status(401).json({
                     message: 'Token inválido',
-                    erro: error
+                    erro: error.toString()
                 });
             } else {
                 next();

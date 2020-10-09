@@ -3,7 +3,7 @@ const repository = require('../repositories/customer-repository');
 const log = require('../repositories/log-repository');
 
 exports.post = async (req, res) => {
-    let result = true;
+    let result = 'true';
     let err = '';
     try {
         await repository.post({
@@ -15,12 +15,12 @@ exports.post = async (req, res) => {
             message: 'Consumidor cadastro com sucesso'
         });
     } catch (error) {
-        console.log(error);
+        
         res.status(500).send({
             message: 'Falha ao processar requisição',
-            erro: error
+            erro: error.toString()
         });
-        result = false;
+        result = 'false';
         err = error;
     }
 
@@ -29,7 +29,7 @@ exports.post = async (req, res) => {
         code: '1',
         description: 'Insert new customer',
         success: result,
-        error: err,
+        error: err.message ? err.message : '',
         date: (new Date()).valueOf().toString()
     };
 
@@ -37,18 +37,18 @@ exports.post = async (req, res) => {
 };
 
 exports.getAll = async(req, res) => {
-    let result = true;
+    let result = 'true';
     let err = '';
     try {
         const data = await repository.getAll();
         res.status(201).send(data);
     } catch (error) {
-        console.log(error);
+        
         res.status(500).send({
             message: 'Falha ao processar requisição',
-            erro: error
+            erro: error.toString()
         });
-        result = false;
+        result = 'false';
         err = error;
     }
 
@@ -57,7 +57,7 @@ exports.getAll = async(req, res) => {
         code: '2',
         description: 'Get all customers',
         success: result,
-        error: err,
+        error: err.message ? err.message : '',
         date: (new Date()).valueOf().toString()
     };
 
@@ -65,19 +65,23 @@ exports.getAll = async(req, res) => {
 };
 
 exports.getById = async(req, res) => {
-    let result = true;
+    let result = 'true';
     let err = '';
     try {
         const id = req.params.customerId;
         const data = await repository.getById(id);
-        res.status(200).send(data);
+        if (data) {
+            res.status(200).send(data);
+        } else {
+            res.status(404).send({message: 'Consumidor não encontrado'});
+        }
     } catch (error) {
-        console.log(error);
+        
         res.status(500).send({
             message: 'Falha ao processar requisição',
-            erro: error
+            erro: error.toString()
         });
-        result = false;
+        result = 'false';
         err = error;
     }
 
@@ -86,7 +90,7 @@ exports.getById = async(req, res) => {
         code: '3',
         description: 'Get customer by id',
         success: result,
-        error: err,
+        error: err.message ? err.message : '',
         date: (new Date()).valueOf().toString()
     };
 
@@ -94,7 +98,7 @@ exports.getById = async(req, res) => {
 };
 
 exports.put = async(req, res) => {
-    let result = true;
+    let result = 'true';
     let err = '';
     try {
         const id = req.params.customerId;
@@ -104,12 +108,12 @@ exports.put = async(req, res) => {
             data: data
         });
     } catch (error) {
-        console.log(error);
+        
         res.status(500).send({
             message: 'Falha ao processar requisição',
-            erro: error
+            erro: error.toString()
         });
-        result = false;
+        result = 'false';
         err = error;
     }
 
@@ -118,7 +122,7 @@ exports.put = async(req, res) => {
         code: '4',
         description: 'Update a customer',
         success: result,
-        error: err,
+        error: err.message ? err.message : '',
         date: (new Date()).valueOf().toString()
     };
 
@@ -126,7 +130,7 @@ exports.put = async(req, res) => {
 };
 
 exports.delete = async(req, res) => {
-    let result = true;
+    let result = 'true';
     let err = '';
     try {
         await repository.delete(req.params.customerId);
@@ -136,9 +140,9 @@ exports.delete = async(req, res) => {
     } catch (error) {
         res.status(500).send({
             message: 'Falha ao processar requisição',
-            erro: error
+            erro: error.toString()
         });
-        result = false;
+        result = 'false';
         err = error;
     }
 
@@ -147,7 +151,7 @@ exports.delete = async(req, res) => {
         code: '5',
         description: 'Delete a customer',
         success: result,
-        error: err,
+        error: err.message ? err.message : '',
         date: (new Date()).valueOf().toString()
     };
 
@@ -155,14 +159,14 @@ exports.delete = async(req, res) => {
 };
 
 exports.customerRegister = async(req, res) => {
-    let result = true;
+    let result = 'true';
     let err = '';
     try {
         await repository.register(req.body.nome, req.body.email, req.body.senha);
         res.status(201).json({message: "Usuário registrado com sucesso"});
     } catch (error) {
         res.status(500).json({message: "Não foi possível registrar usuário", erro: error});
-        result = false;
+        result = 'false';
         err = error;
     }
 
@@ -171,7 +175,7 @@ exports.customerRegister = async(req, res) => {
         code: '6',
         description: 'Register a customer',
         success: result,
-        error: err,
+        error: err.message ? err.message : '',
         date: (new Date()).valueOf().toString()
     };
 

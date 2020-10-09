@@ -4,7 +4,7 @@ const repository = require('../repositories/product-repository');
 const log = require('../repositories/log-repository');
 
 exports.post = async (req, res) => {
-    let result = true;
+    let result = 'true';
     let err = '';
     try {
         await repository.post({
@@ -16,12 +16,12 @@ exports.post = async (req, res) => {
             message: 'Produto cadastro com sucesso'
         });
     } catch (error) {
-        console.log(error);
+        
         res.status(500).send({
             message: 'Falha ao processar requisição',
-            erro: error
+            erro: error.toString()
         });
-        result = false;
+        result = 'false';
         err = error;
     }
 
@@ -30,7 +30,7 @@ exports.post = async (req, res) => {
         code: '7',
         description: 'Insert new product',
         success: result,
-        error: err,
+        error: err.message ? err.message : '',
         date: (new Date()).valueOf().toString()
     };
 
@@ -38,18 +38,19 @@ exports.post = async (req, res) => {
 };
 
 exports.getAll = async(req, res) => {
-    let result = true;
+    let result = 'true';
     let err = '';
     try {
         const data = await repository.getAll();
-        res.status(201).send(data);
+        const quantity = data.length;
+        res.status(201).send({"total": quantity, "data": data});
     } catch (error) {
-        console.log(error);
+        
         res.status(500).send({
             message: 'Falha ao processar requisição',
-            erro: error
+            erro: error.toString()
         });
-        result = false;
+        result = 'false';
         err = error;
     }
 
@@ -58,7 +59,7 @@ exports.getAll = async(req, res) => {
         code: '8',
         description: 'Get all products',
         success: result,
-        error: err,
+        error: err.message ? err.message : '',
         date: (new Date()).valueOf().toString()
     };
 
@@ -66,19 +67,23 @@ exports.getAll = async(req, res) => {
 };
 
 exports.getById = async(req, res) => {
-    let result = true;
+    let result = 'true';
     let err = '';
     try {
         const id = req.params.productId;
         const data = await repository.getById(id);
-        res.status(200).send(data);
+        if (data) {
+            res.status(200).send(data);
+        } else {
+            res.status(404).send({message: 'Produto não encontrado'});
+        }
     } catch (error) {
-        console.log(error);
+        
         res.status(500).send({
             message: 'Falha ao processar requisição',
-            erro: error
+            erro: error.toString()
         });
-        result = false;
+        result = 'false';
         err = error;
     }
 
@@ -87,7 +92,7 @@ exports.getById = async(req, res) => {
         code: '9',
         description: 'Get product by id',
         success: result,
-        error: err,
+        error: err.message ? err.message : '',
         date: (new Date()).valueOf().toString()
     };
 
@@ -95,7 +100,7 @@ exports.getById = async(req, res) => {
 };
 
 exports.put = async(req, res) => {
-    let result = true;
+    let result = 'true';
     let err = '';
     try {
         const id = req.params.productId;
@@ -105,12 +110,12 @@ exports.put = async(req, res) => {
             data: data
         });
     } catch (error) {
-        console.log(error);
+        
         res.status(500).send({
             message: 'Falha ao processar requisição',
-            erro: error
+            erro: error.toString()
         });
-        result = false;
+        result = 'false';
         err = error;
     }
 
@@ -119,7 +124,7 @@ exports.put = async(req, res) => {
         code: '10',
         description: 'Update a product',
         success: result,
-        error: err,
+        error: err.message ? err.message : '',
         date: (new Date()).valueOf().toString()
     };
 
@@ -127,7 +132,7 @@ exports.put = async(req, res) => {
 };
 
 exports.delete = async(req, res) => {
-    let result = true;
+    let result = 'true';
     let err = '';
     try {
         await repository.delete(req.params.productId);
@@ -137,9 +142,9 @@ exports.delete = async(req, res) => {
     } catch (error) {
         res.status(500).send({
             message: 'Falha ao processar requisição',
-            erro: error
+            erro: error.toString()
         });
-        result = false;
+        result = 'false';
         err = error;
     }
 
@@ -148,7 +153,7 @@ exports.delete = async(req, res) => {
         code: '11',
         description: 'Delete a product',
         success: result,
-        error: err,
+        error: err.message ? err.message : '',
         date: (new Date()).valueOf().toString()
     };
 
