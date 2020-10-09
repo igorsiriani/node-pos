@@ -1,7 +1,11 @@
+const crypto = require('crypto');
 const Produto = require('../app/models/product');
-repository = require('../repositories/product-repository');
+const repository = require('../repositories/product-repository');
+const log = require('../repositories/log-repository');
 
 exports.post = async (req, res) => {
+    let result = true;
+    let err = '';
     try {
         await repository.post({
             nome: req.body.nome,
@@ -17,10 +21,25 @@ exports.post = async (req, res) => {
             message: 'Falha ao processar requisição',
             erro: error
         });
+        result = false;
+        err = error;
     }
+
+    var id = crypto.randomBytes(20).toString('hex');
+    var extract = {
+        code: '7',
+        description: 'Insert new product',
+        success: result,
+        error: err,
+        date: (new Date()).valueOf().toString()
+    };
+
+    log.post({key: {"id": id}, data: extract});
 };
 
 exports.getAll = async(req, res) => {
+    let result = true;
+    let err = '';
     try {
         const data = await repository.getAll();
         res.status(201).send(data);
@@ -30,10 +49,25 @@ exports.getAll = async(req, res) => {
             message: 'Falha ao processar requisição',
             erro: error
         });
+        result = false;
+        err = error;
     }
+
+    var id = crypto.randomBytes(20).toString('hex');
+    var extract = {
+        code: '8',
+        description: 'Get all products',
+        success: result,
+        error: err,
+        date: (new Date()).valueOf().toString()
+    };
+
+    log.post({key: {"id": id}, data: extract});
 };
 
 exports.getById = async(req, res) => {
+    let result = true;
+    let err = '';
     try {
         const id = req.params.productId;
         const data = await repository.getById(id);
@@ -44,10 +78,25 @@ exports.getById = async(req, res) => {
             message: 'Falha ao processar requisição',
             erro: error
         });
+        result = false;
+        err = error;
     }
+
+    var id = crypto.randomBytes(20).toString('hex');
+    var extract = {
+        code: '9',
+        description: 'Get product by id',
+        success: result,
+        error: err,
+        date: (new Date()).valueOf().toString()
+    };
+
+    log.post({key: {"id": id}, data: extract});
 };
 
 exports.put = async(req, res) => {
+    let result = true;
+    let err = '';
     try {
         const id = req.params.productId;
         const data = await repository.put(id, req.body);
@@ -61,10 +110,25 @@ exports.put = async(req, res) => {
             message: 'Falha ao processar requisição',
             erro: error
         });
+        result = false;
+        err = error;
     }
+
+    var id = crypto.randomBytes(20).toString('hex');
+    var extract = {
+        code: '10',
+        description: 'Update a product',
+        success: result,
+        error: err,
+        date: (new Date()).valueOf().toString()
+    };
+
+    log.post({key: {"id": id}, data: extract});
 };
 
 exports.delete = async(req, res) => {
+    let result = true;
+    let err = '';
     try {
         await repository.delete(req.params.productId);
         res.status(200).send({
@@ -75,5 +139,18 @@ exports.delete = async(req, res) => {
             message: 'Falha ao processar requisição',
             erro: error
         });
+        result = false;
+        err = error;
     }
+
+    var id = crypto.randomBytes(20).toString('hex');
+    var extract = {
+        code: '11',
+        description: 'Delete a product',
+        success: result,
+        error: err,
+        date: (new Date()).valueOf().toString()
+    };
+
+    log.post({key: {"id": id}, data: extract});
 };
